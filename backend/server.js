@@ -138,7 +138,7 @@ app.post('/stripe-complete', express.raw({type: 'application/json'}), (request, 
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed':
-      console.log('skapa wc order', event.data.object)
+      console.log('skapa wc order', event.data.object.payment_status)
       break;
     default:
       // Unexpected event type
