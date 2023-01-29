@@ -2,10 +2,12 @@ import {useState, useEffect} from 'react'
 import Cart from './components/Cart'
 import Product from './components/Product'
 import StripeSession from './components/StripeSession'
+import { NODE_SERVER_URL } from './constants'
 
 function App() {
+
   useEffect(() => {
-    fetch("http://localhost:5000/get-all-products")
+    fetch(`${NODE_SERVER_URL}/get-all-products`)
       .then(res => res.json())
       .then(data => setProducts(data))
   }, [])

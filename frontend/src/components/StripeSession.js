@@ -1,8 +1,11 @@
+import { NODE_SERVER_URL } from "../constants"
+
 export default function StripeSession({ cart }) {
 
 
 
     function startSession () {
+      
 
         let items = cart.map(item => {
             return {
@@ -15,7 +18,7 @@ export default function StripeSession({ cart }) {
     
         console.log(items)
         
-        fetch("http://localhost:5000/create-checkout-session", {
+        fetch(`${NODE_SERVER_URL}/create-checkout-session`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
