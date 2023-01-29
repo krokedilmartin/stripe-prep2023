@@ -56,20 +56,50 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 })
 
-app.post("/create-woo-order", async (req, res) => {
-  // const { sessionId } = req.body
-  // const {customer_details, payment_status} = await stripe.checkout.sessions.retrieve(sessionId);
+app.get("/get-all-products", async (req, res) => {
 
-  // if(payment_status === 'paid'){
-  //   console.log('beställningen är betald')
-  // }
+  WooCommerce.get("products")
+  .then((response) => {
+    res.json(response.data)
+  })
+  .catch((error) => {
+    console.log(error.response.data);
+  });
+})
 
+app.post('/stripe-complete', express.raw({type: 'application/json'}), (request, response) => {
+  let event = request.body;
+  console.log('martin event stripe-complete', event)
+
+  // Handle the event
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const { payment_status,  customer_details} = event.data.object
+      const { email, name } = customer_details
+
+      if(payment_status === 'paid'){
+        console.log('skapa wc order', email, name)
+        createWcOrder(email, name)
+      }
+
+      break;
+    default:
+      // Unexpected event type
+      console.log(`Unhandled event type ${event.type}.`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.status(200).send({hej: 'martin'});
+});
+
+
+function createWcOrder(email, name) {
   const data = {
-    payment_method: "bacs",
-    payment_method_title: "Direct Bank Transfer",
+    payment_method: "Stripe",
+    payment_method_title: "Stripe kort",
     set_paid: true,
     billing: {
-      first_name: "John",
+      first_name: name,
       last_name: "Doe",
       address_1: "969 Market",
       address_2: "",
@@ -77,7 +107,7 @@ app.post("/create-woo-order", async (req, res) => {
       state: "CA",
       postcode: "94103",
       country: "US",
-      email: "john.doe@example.com",
+      email: email,
       phone: "(555) 555-5555"
     },
     shipping: {
@@ -109,52 +139,13 @@ app.post("/create-woo-order", async (req, res) => {
       }
     ]
   };
-  
+
   WooCommerce.post("orders", data)
-    .then((response) => {
-      console.log('ordern skapades')
-      // console.log(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-})
-
-app.get("/get-all-products", async (req, res) => {
-
-  WooCommerce.get("products")
   .then((response) => {
-    res.json(response.data)
+    console.log('ordern skapades')
+    // console.log(response.data);
   })
   .catch((error) => {
-    console.log(error.response.data);
+    console.log(error);
   });
-})
-
-app.post('/stripe-complete', express.raw({type: 'application/json'}), (request, response) => {
-  let event = request.body;
-  console.log('martin event stripe-complete', event)
-
-  // Handle the event
-  switch (event.type) {
-    case 'checkout.session.completed':
-      const { payment_status,  customer_details} = event.data.object
-      const { email, name } = customer_details
-
-      if(payment_status === 'paid'){
-        console.log('skapa wc order', email, name)
-
-      }
-      
-      break;
-    default:
-      // Unexpected event type
-      console.log(`Unhandled event type ${event.type}.`);
-  }
-
-  // Return a 200 response to acknowledge receipt of the event
-  response.status(200).send({hej: 'martin'});
-});
-
-
-
+}
