@@ -24,13 +24,13 @@ const WooCommerce = new WooCommerceRestApi({
 });
 
 app.post("/create-checkout-session", async (req, res) => {
-  let reqItems = req.body.items
+  const { items } = req.body
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      line_items: reqItems.map(item => {
+      line_items: items.map(item => {
         return {
           price_data: {
             currency: "usd",
@@ -81,7 +81,6 @@ app.post('/stripe-complete', express.raw({type: 'application/json'}), (request, 
         console.log('skapa wc order', email, name)
         createWcOrder(email, name)
       }
-
       break;
     default:
       // Unexpected event type
@@ -89,7 +88,7 @@ app.post('/stripe-complete', express.raw({type: 'application/json'}), (request, 
   }
 
   // Return a 200 response to acknowledge receipt of the event
-  response.status(200).send({hej: 'martin'});
+  response.status(200).send();
 });
 
 

@@ -2,11 +2,7 @@ import { NODE_SERVER_URL } from "../constants"
 
 export default function StripeSession({ cart }) {
 
-
-
     function startSession () {
-      
-
         let items = cart.map(item => {
             return {
                 id: item.id,
