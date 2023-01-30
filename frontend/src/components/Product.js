@@ -5,7 +5,7 @@ export default function Product({ data, cart, setCart }) {
         setCart([...cart, {
             id: id,
             name: name,
-            priceInCents: price * 100
+            price: Number(price)
         }])
     }
   return (

@@ -12,12 +12,10 @@ export default function StripeSession({ cart }) {
                 id: item.id,
                 quantity: 1,
                 name: item.name,
-                priceInCents: item.priceInCents
+                priceInCents: item.price * 100
             }
         })
-    
-        console.log(items)
-        
+            
         fetch(`${NODE_SERVER_URL}/create-checkout-session`, {
           method: "POST",
           headers: {
